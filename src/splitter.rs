@@ -6,8 +6,8 @@ use glob::glob;
 use std::fs::remove_file;
 use std::path::Path;
 use crate::Config;
-use crate::wpaperd::{WpaperdConfig, cmd_wrapper};
 use crate::outputs::Monitor;
+use std::process::{Command, Stdio};
 
 pub struct ResultPaper {
     pub monitor_name: String,
@@ -50,77 +50,45 @@ impl Splitter {
             config
         );
 
-        // check if we need to generate wpaperd config
-        if config.with_wpaperd {
-            // create new wpaperd instance
-            let wpaperd = WpaperdConfig::new(
-                format!(
-                    "{}/.config/wpaperd/wallpaper.toml",
-                    var("HOME").unwrap()
-                ),
-                self.hash.clone()
-            );
+        // check caches
+        let caches_present = self.check_caches();
+        // TODO: self.result_papers not being set if cache exists.
 
-            // check caches
-            let caches_present = self.check_caches();
+        // do we need to resplit
+        if
+            true
+            // config.force_resplit ||
+            // ! caches_present
+        {
+            // cleanup caches first
+            self.cleanup_cache();
 
-            // do we need to resplit
-            if
-                config.force_resplit ||
-                ! caches_present
-            {
-                // cleanup caches first
-                self.cleanup_cache();
-
-                // we need to resplit
-                self.result_papers = self.perform_split(
-                    img,
-                    config,
-                    format!("{}/.cache/",var("HOME").unwrap())
-                ).map_err(
-                    |err| err.to_string()
-                )?;
-            }
-
-            //check wpaper config hash
-            let wpaperd_present = wpaperd.check_existing().map_err(
-                |err| err.to_string()
-            )?;
-
-            // do we need to rebuild config
-            // also always rebuild when force resplit was set
-            if
-                config.force_resplit ||
-                ! wpaperd_present 
-            {
-                // yes we do
-                wpaperd.build(&self.result_papers).map_err(
-                    |err| err.to_string()
-                )?;
-            }
-
-            // finally, run wrapper
-            cmd_wrapper().map_err(
-                |err| err.to_string()
-            )?;
-
-        // no wpaperd to worry about, just split
-        } else {
-            // just split
+            // we need to resplit
             self.result_papers = self.perform_split(
                 img,
                 config,
-                format!("{}/",var("PWD").unwrap())
+                format!("{}/.cache/",var("HOME").unwrap())
             ).map_err(
                 |err| err.to_string()
             )?;
         }
 
-        // return
+        for monitor in &self.result_papers {
+            if (!config.silent) {
+                // Output in sway config style.
+                println!("output {} bg {} fill", monitor.monitor_name.to_string(), monitor.image_full_path.to_string());
+            }
+            if (!config.dont_set) {
+                // Set background for this monitor.
+                cmd_setbg(&monitor)?;
+            }
+        }
+
         Ok(())
     }
 
     // do the actual splitting
+    // TODO: Very slow for some reason (especially resizing and saving), try to optimize.
     fn perform_split(&self, mut img: DynamicImage, config: &Config, save_path: String) -> Result<Vec<ResultPaper>, String> {
         /*
             Calculate Overall Size
@@ -147,7 +115,7 @@ impl Splitter {
         // either if user doesn't deny
         // or if image is too small
         if
-            config.dont_downscale == false
+            config.no_downscale == false
             || img.dimensions().0 < overall_width
             || img.dimensions().1 < overall_height
         {
@@ -178,7 +146,7 @@ impl Splitter {
                     ),
                     image: cropped_image
                 }
-            )
+            );
         }
 
         // save our result images
@@ -208,7 +176,7 @@ impl Splitter {
         format!(
             "# {:?}{:?}{:?}\n",
             img_hash,
-            compute(config.dont_downscale.to_string()),
+            compute(config.no_downscale.to_string()),
             compute(hash_string.as_bytes())
         )
     }
@@ -230,6 +198,7 @@ impl Splitter {
     }
 
     fn check_caches(&self) -> bool {
+
         // what we search for
         let base_format = format!(
             "{}/.cache/rwps_{}",
@@ -255,3 +224,32 @@ impl Splitter {
         true
     }
 }
+
+
+fn cmd_setbg(wallpaper: &ResultPaper) -> Result<(), String> {
+
+    let sway_socket = var("SWAYSOCK")
+        .map_err(|_| "MY_VAR environment variable not set".to_string())?;
+
+    Command::new("swaymsg")
+        .arg("-s")
+        .arg(&sway_socket)
+        .arg("output")
+        .arg(&wallpaper.monitor_name)
+        .arg("bg")
+        .arg(&wallpaper.image_full_path)
+        .arg("fill")
+        .stdout(Stdio::null())
+        .status()
+        //.and_then(|exit_status| exit_status.exit_ok().map_err(|e| e.to_string()))
+        //.map_err(|err| err.to_string())
+        .map_or_else(
+            |err| Err(err.to_string()),
+            |exit_status| if exit_status.success() {
+                Ok(())
+            } else {
+                Err("Exit with error".to_string())
+            }
+         )
+}
+

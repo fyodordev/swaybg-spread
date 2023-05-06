@@ -10,24 +10,29 @@ struct Args {
    #[arg(short, long)]
    image: String,
 
-   /// Use wpaperd integration
-   #[arg(short, long)]
-   wpaperd: bool,
-
    /// Force Resplit even if cache exists
    #[arg(short, long)]
    force_resplit: bool,
 
    /// Don't downscale base image, even if it's bigger than needed
    #[arg(short, long)]
-   dont_downscale: bool,
+   no_downscale: bool,
+
+   /// Don't downscale base image, even if it's bigger than needed
+   #[arg(short, long)]
+   dont_set: bool,
+
+   /// Don't downscale base image, even if it's bigger than needed
+   #[arg(short, long)]
+   silent: bool,
 }
 
 pub struct Config {
     pub image_path: PathBuf,
-    pub with_wpaperd: bool,
     pub force_resplit: bool,
-    pub dont_downscale: bool,
+    pub no_downscale: bool,
+    pub dont_set: bool,
+    pub silent: bool,
 }
 
 impl Config {
@@ -46,9 +51,10 @@ impl Config {
         // construct
         Ok(Self {
             image_path: in_path,
-            with_wpaperd: args.wpaperd,
             force_resplit: args.force_resplit,
-            dont_downscale: args.dont_downscale
+            no_downscale: args.no_downscale,
+            dont_set: args.dont_set,
+            silent: args.silent,
         })
     }
 

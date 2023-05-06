@@ -796,20 +796,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "rwpspread"
-version = "0.1.1"
-dependencies = [
- "clap",
- "colored",
- "glob",
- "image",
- "md5",
- "smithay-client-toolkit",
- "toml",
- "wayland-client",
-]
-
-[[package]]
 name = "scoped-tls"
 version = "1.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -892,6 +878,20 @@ name = "strsim"
 version = "0.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "73473c0e59e6d5812c5dfe2a064a6444949f089e20eec9a2e5506596494e4623"
+
+[[package]]
+name = "swaybg-spread"
+version = "0.1.1"
+dependencies = [
+ "clap",
+ "colored",
+ "glob",
+ "image",
+ "md5",
+ "smithay-client-toolkit",
+ "toml",
+ "wayland-client",
+]
 
 [[package]]
 name = "syn"

@@ -1,7 +1,6 @@
 mod parser;
 mod splitter;
 mod outputs;
-mod wpaperd;
 
 use std::process;
 use colored::Colorize;
