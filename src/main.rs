@@ -1,32 +1,38 @@
 mod parser;
 mod splitter;
 mod outputs;
+mod setter;
 
 use std::process;
 use colored::Colorize;
-use parser::Config;
+use parser::AppConfig;
 use splitter::Splitter;
+use crate::outputs::Monitor;
 
+
+// Read app and output config and use it to run splitter.
 fn run() -> Result<(), String> {
-    // create new config
-    let worker_config = Config::new().map_err(
-        |err| err.to_string()
-    )?;
+    // read config
+    let app_config = AppConfig::new()
+        .map_err(|err| err.to_string())?;
+
+    // fetch monitors
+    let monitors = Monitor::get_monitors()
+        .map_err(|err| err.to_string())?;
 
     // create new splitter
-    let worker = Splitter::new();
+    let splitter = Splitter::new(&app_config, &monitors);
 
     // perform split
-    worker.run(&worker_config).map_err(
-        |err| err.to_string(),
-    )?;
+    splitter.run()
+        .map_err(|err| err.to_string())?;
 
-    // return
     Ok(())
 }
 
+
+// Run app, output errors.
 fn main() {
-    // run with config
     if let Err(err) = run() {
         eprintln!("{}: {}", "rwpspread".red().bold(), err);
         process::exit(1);

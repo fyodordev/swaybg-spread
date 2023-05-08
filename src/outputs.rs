@@ -7,6 +7,7 @@ use smithay_client_toolkit::{
 use wayland_client::{globals::registry_queue_init, protocol::wl_output, Connection, QueueHandle};
 
 // generic monitor struct
+#[derive(Clone, Hash)]
 pub struct Monitor {
     pub name: String,
     pub width: u32,
@@ -21,7 +22,7 @@ struct ListOutputs {
 }
 
 impl Monitor {
-    pub fn new() -> Result<Vec<Monitor>, String> {
+    pub fn get_monitors() -> Result<Vec<Monitor>, String> {
         // new vector for result imgs
         let mut result: Vec<Monitor> = Vec::new();
 
