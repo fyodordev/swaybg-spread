@@ -11,9 +11,9 @@ struct Args {
    #[arg(short, long)]
    image: String,
 
-   /// Cache Path
+   /// Set custom save path for image fragments.
    #[arg(short, long)]
-   cache_path: Option<String>,
+   output_path: Option<String>,
 
    /// Force Resplit even if cache exists
    #[arg(short, long)]
@@ -23,11 +23,11 @@ struct Args {
    #[arg(short, long)]
    no_downscale: bool,
 
-   /// Don't downscale base image, even if it's bigger than needed
+   /// Do not set wallpaper immediately.
    #[arg(short, long)]
    dont_set: bool,
 
-   /// Don't downscale base image, even if it's bigger than needed
+   /// Do not put config lines.
    #[arg(short, long)]
    silent: bool,
 }
@@ -35,7 +35,7 @@ struct Args {
 #[derive(Clone, Hash)]
 pub struct AppConfig {
     pub image_path: PathBuf,
-    pub cache_path: PathBuf,
+    pub output_path: PathBuf,
     pub force_resplit: bool,
     pub no_downscale: bool,
     pub dont_set: bool,
@@ -57,8 +57,8 @@ impl AppConfig {
 
         let home_dir = var("HOME").map_err(|_| "HOME env variable not set")?;
         let default_cache_path = format!("{home_dir}/.cache/");
-        let cache_path_string = args.cache_path.unwrap_or(default_cache_path);
-        let cache_path = AppConfig::check_path(Path::new(&cache_path_string));
+        let output_path_string = args.output_path.unwrap_or(default_cache_path);
+        let output_path = AppConfig::check_path(Path::new(&output_path_string));
 
         // construct
         Ok(Self {
@@ -67,13 +67,13 @@ impl AppConfig {
             no_downscale: args.no_downscale,
             dont_set: args.dont_set,
             silent: args.silent,
-            cache_path,
+            output_path,
         })
     }
 
     pub fn resolve_cached_fragment_path(&self, monitor_name: &str, hash: &str) -> String {
         // TODO: Work with path properly.
-        let base_path = self.cache_path.display();
+        let base_path = self.output_path.display();
         format!("{base_path}swaybg_spread_{hash}_{monitor_name}.png")
     }
 
