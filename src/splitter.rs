@@ -1,10 +1,6 @@
 use std::cmp;
-use std::env::var;
 use image::{GenericImageView, DynamicImage, imageops::FilterType};
 use std::path::PathBuf;
-use md5::{compute, Digest};
-use glob::glob;
-use std::fs::remove_file;
 use crate::AppConfig;
 use crate::outputs::Monitor;
 use crate::setter::set_wallpaper;
@@ -40,7 +36,7 @@ impl Splitter {
 
         let fragments = self.get_split_image(&self.app_config.image_path)?;
 
-        set_wallpaper(&self.app_config, fragments.as_slice());
+        set_wallpaper(&self.app_config, fragments.as_slice())?;
 
         Ok(())
     }

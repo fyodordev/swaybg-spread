@@ -34,7 +34,7 @@ fn run() -> Result<(), String> {
 // Run app, output errors.
 fn main() {
     if let Err(err) = run() {
-        eprintln!("{}: {}", "rwpspread".red().bold(), err);
+        eprintln!("{}: {}", "Error".red().bold(), err);
         process::exit(1);
     }
 }

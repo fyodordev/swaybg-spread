@@ -74,7 +74,7 @@ impl AppConfig {
     pub fn resolve_cached_fragment_path(&self, monitor_name: &str, hash: &str) -> String {
         // TODO: Work with path properly.
         let base_path = self.cache_path.display();
-        format!("{base_path}rwps_{hash}_{monitor_name}.png")
+        format!("{base_path}swaybg_spread_{hash}_{monitor_name}.png")
     }
 
     // check if target path is a symlink

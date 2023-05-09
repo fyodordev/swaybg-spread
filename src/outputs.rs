@@ -72,18 +72,6 @@ impl Monitor {
 
         Ok(result)
     }
-
-    // string format for hash calculation
-    pub fn to_string(&self) -> String {
-        format!(
-            "{}{}{}{}{}",
-            &self.name,
-            &self.x,
-            &self.y,
-            &self.width,
-            &self.height
-        )
-    }
 }
 
 impl OutputHandler for ListOutputs {
