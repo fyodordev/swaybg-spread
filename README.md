@@ -1,61 +1,37 @@
-# rwpspread
+swaybg-spread
+=============
 
-[![Rust](https://github.com/0xk1f0/rwpspread/actions/workflows/rust.yml/badge.svg)](https://github.com/0xk1f0/rwpspread/actions/workflows/rust.yml)
-![AUR](https://img.shields.io/aur/version/rwpspread)
+A CLI tool to set a wallpaper spanning over multiple monitors in sway.
 
-Wallpaper Utility written in Rust
+It uses the Wayland output configuration to determine monitor size and position, and splits the provided image into separate images for each monitor. These are saved to `~/.cache` by default. It then uses `swaybg` to set the images on the corresponding monitors. To persist the changes the program outputs sway configuration lines which can be written to a sway configuration file.
 
-## Features
 
-- Spans an input wallpaper across all monitors
-- Works alongside any wlroots based compositor f.E. [Hyprland](https://hyprland.org/)
-- Uses [wpaperd](https://github.com/danyspin97/wpaperd) as wallpaper daemon
-- Code quality is probably pretty poor as I'm new to Rust
 
-## Installing
+Originally forked off of [0xk1f0/rwpspread](https://github.com/0xk1f0/rwpspread)
 
-On Archlinux via the [AUR](https://aur.archlinux.org/)
+
+Usage
+-----
+
+Set wallpaper and write it to a sway configuration file to persist sway reloads (The file is imported in the main sway configuration file with `include ~/.config/sway/config.d/*`):
 
 ```bash
-paru -S rwpspread-git
+swaybg-spread -i ~/.theme/active/wallpaper.jpg > ~/.config/sway/config.d/bg.conf 
 ```
 
-## Building
+Use custom location for saving image fragments:
 
 ```bash
-git clone https://github.com/0xk1f0/rwpspread.git
-cd rwpspread/
+swaybg-spread -i ~/.theme/active/wallpaper.jpg -o ~/.theme/fragments > ~/.config/sway/config.d/bg.conf 
+```
+
+
+Building
+--------
+
+```bash
+git clone https://github.com/fyodordev/swaybg-spread.git
+cd swaybg-spread
 cargo build --release
 ```
 
-## Usage
-
-```bash
-# it takes an input image
-# screens are automatically read
-# if running a wlroots based compositor
-rwpspread -i <image>
-
-# for example
-rwpspread -i /some/path/wallpaper.png
-
-# to use the wpaperd integration
-# this autogenerates the config file
-# you will need to have wpaperd installed
-rwpspread -w -i /some/path/wallpaper.png
-
-# for more info
-rwpspread --help
-```
-
-## Checklist
-
-- [x] splitting for dual screen layout
-- [x] splitting for any screen layout (two or more screens)
-- [x] Hyprland/wlroots Integration
-- [x] wpaperd Integration
-- [x] wallpaper caching (don't resplit if we don't need to)
-- [ ] color palette generation from wallpaper
-- [ ] watchdog auto-resplit on output change
-- [ ] alignment adjust if wallpaper is big enough
-- [ ] monitor bezel compensation
