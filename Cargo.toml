@@ -1,6 +1,6 @@
 [package]
 name = "swaybg-spread"
-version = "0.1.1"
+version = "0.2.0"
 edition = "2021"
 authors = ["Fyodor Perejoguine <fyodordev@gmail.com>"]
 description = "CLI tool to set wallpaper spanning multiple outputs on sway."
