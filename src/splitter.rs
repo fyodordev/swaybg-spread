@@ -63,11 +63,9 @@ impl Splitter {
         // return either from cache or split.
         if let Ok(result_fragments) = self.load_from_cache(image_hash.as_str()) {
             // Return from cache.
-            println!("Returing from cache");
             return Ok(result_fragments);
         } else {
             // Calculate fragments and save to file.
-            println!("Calculating fragments");
             return self.perform_split(image, image_hash.as_str());
         }
     }
@@ -144,7 +142,6 @@ impl Splitter {
 
     fn load_from_cache(&self, hash: &str) -> Result<Vec<ImageFragment>, String> {
         if self.app_config.force_resplit {
-            println!("Force resplit");
             return Err("Force resplit".to_string())
         }
 
