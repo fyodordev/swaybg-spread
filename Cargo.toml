@@ -9,7 +9,7 @@ repository = ""
 license = "GNU GPL v3"
 
 [dependencies]
-clap = { version = "4.2.5", features = ["derive"] }
+clap = { version = "4.3.19", features = ["derive"] }
 colored = "2.0.0"
 smithay-client-toolkit = { git = "https://github.com/Smithay/client-toolkit", default_features = false, features = [ "calloop" ] }
 wayland-client = "0.30.1"
